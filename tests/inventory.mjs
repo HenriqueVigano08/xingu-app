@@ -19,7 +19,7 @@ await db.exec(setup);for(const [key,u] of Object.entries(users))await db.query('
 await db.exec(await readFile('migrations/001_inicial.sql','utf8'));
 await db.query('insert into public.inventories(owner,data,version) values($1,$2,7)',[users.admin.id,JSON.stringify({products:[],moves:[]})]);
 // O e-mail da administração é um marcador no arquivo público; o teste usa um endereço fictício.
-const migration=(await readFile('migrations/002_equipe.sql','utf8')).replace("'admin@exemplo.com'","'"+users.admin.email+"'");
+const migration=(await readFile('migrations/002_equipe.sql','utf8')).replaceAll("'admin@exemplo.com'","'"+users.admin.email+"'");
 assert.ok(migration.includes(users.admin.email));await db.exec(migration);await db.exec(migration);
 assert.equal((await db.query('select version from public.xingu_migration_backup')).rows[0].version,7);
 assert.equal((await db.query('select count(*)::int as n from public.xingu_members')).rows[0].n,1);

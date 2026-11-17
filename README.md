@@ -49,6 +49,12 @@ npm run build     # exige o arquivo .env (veja .env.example)
 npm run preview   # servidor local com a API; exige .dev.vars
 ```
 
+## Publicação
+
+A publicação é automática: cada alteração enviada ao ramo `main` dispara um build no Cloudflare Workers, que roda os testes, a verificação de tipos e a compilação antes de publicar. Se algum passo falhar, nada é publicado e a versão anterior continua no ar.
+
+As variáveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` ficam nas configurações de build do Worker; os segredos do servidor ficam nos segredos do Worker.
+
 ## Configuração
 
 | Arquivo / local | Conteúdo | Público? |

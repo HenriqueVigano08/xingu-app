@@ -33,6 +33,8 @@ npm run build
 
 ## 3. Publicação (Cloudflare Workers)
 
+A primeira publicação é feita pelo terminal. Depois dela, o caminho recomendado é conectar o repositório ao **Workers Builds** (veja 3.1), e as publicações seguintes passam a ser automáticas.
+
 ```bash
 npx wrangler login
 npx wrangler whoami
@@ -48,6 +50,30 @@ npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 ```
 
 Os segredos ficam guardados no Cloudflare e continuam valendo nas próximas publicações.
+
+> No GitHub Codespaces, `wrangler login` costuma falhar porque tenta voltar para um endereço local. Nesse caso, crie um token em **Cloudflare → My Profile → API Tokens → Edit Cloudflare Workers** e carregue no terminal com `read -s CLOUDFLARE_API_TOKEN && export CLOUDFLARE_API_TOKEN`.
+
+### 3.1 Publicação automática (Workers Builds)
+
+1. No Cloudflare, abra o Worker → **Settings → Build → Git repository → Connect** e autorize o acesso só a este repositório.
+2. Preencha:
+
+| Campo | Valor |
+|---|---|
+| Production branch | `main` |
+| Build command | `npm test && npm run check && npm run build` |
+| Deploy command | `npx wrangler deploy` |
+| Root directory | `/` |
+| Preview builds | desligado |
+| Variáveis de build | `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` |
+
+3. Deixe o Cloudflare criar o token de API automaticamente.
+
+A partir daí, cada alteração no `main` é testada e publicada sozinha. Se um teste falhar, nada vai para o ar.
+
+### 3.2 Backup automático
+
+Recomendado: um repositório **privado** separado, com uma rotina do GitHub Actions que roda `pg_dump` todo dia, usando o endereço do **Session pooler** do Supabase guardado como segredo. Nunca coloque o backup neste repositório se ele for público.
 
 ## 4. Endereços de retorno
 
